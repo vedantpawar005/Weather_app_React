@@ -1,50 +1,102 @@
 import { useState } from "react";
 
-function Weatherapp()
-{
+function Weatherapp() {
+  const [city, setCity] = useState("");
+  const [forecast, setForecast] = useState([]);
+  const [darkMode, setDarkMode] = useState(false); // 🌙 theme toggle state
 
-  const [city,getcity]=useState("");
-  const [weather,setweather]=useState("");
-  
-  const latlong=`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=64692fc86a6f990bd9151c6ba77b4d45`;
+  async function getForecast() {
+    try {
+      const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=64692fc86a6f990bd9151c6ba77b4d45`;
+      const res = await fetch(geoUrl);
+      const geoData = await res.json();
 
-  async function gettemp()
-  {
-    try
-    {
-      const response=await fetch(latlong);
-      const data= await response.json();
-      const lat=data[0].lat;
-      const lon=data[0].lon;
-      const weather_detail=`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=64692fc86a6f990bd9151c6ba77b4d45`; 
-      const response2=await fetch(weather_detail);
-      const w_data=await response2.json();
-      const temp_c=(w_data.main.temp-273.15).toFixed(1);
-      setweather(`${w_data.weather[0].main}, ${temp_c} °C`);
-    }
-    catch(e)
-    {
-      setweather("Error");
+      if (geoData.length === 0) {
+        setForecast([]);
+        return;
+      }
+
+      const { lat, lon } = geoData[0];
+
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=64692fc86a6f990bd9151c6ba77b4d45&units=metric`;
+      const res2 = await fetch(forecastUrl);
+      const data = await res2.json();
+
+      setForecast(data.list.slice(0, 6));
+    } catch (e) {
+      console.error(e);
+      setForecast([]);
     }
   }
 
-  return(
-    <div className="flex flex-col items-center mt-6">
-  <h1 className="text-3xl font-bold mb-4">Weather App</h1>
-  <input placeholder="Enter City"
-    value={city}
-    onChange={(event)=>{getcity(event.target.value);}}
-   class="border rounded-lg px-3 py-2 w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
-    
-   </input>
-   <button
-   onClick={gettemp}
-      className="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+  return (
+    <div
+      className={`min-h-screen w-full flex flex-col items-center pt-6 transition-colors duration-300 ${
+        darkMode ? "bg-black text-white" : "bg-white text-black"
+      }`}
+    >
+      {/* 🌙 Theme Toggle Button */}
+      <button
+        onClick={() => setDarkMode(!darkMode)}
+        className="absolute top-4 left-4 px-3 py-2 rounded-md border cursor-pointer
+                   bg-gray-200 text-black hover:bg-gray-300
+                   dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
       >
-        Current Weather
+        {darkMode ? "☀️ Light" : "🌙 Dark"}
       </button>
-  <p className="mt-2 text-lg text-gray-600">Current weather:{weather}</p>
-</div>
+
+      <h1 className="text-6xl font-bold mb-10">Weather App</h1>
+
+      <div className="flex gap-2">
+        <input
+          placeholder="Enter City"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="border rounded-lg px-3 py-2 w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={getForecast}
+          className="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 flex items-center justify-center cursor-pointer"
+        >
+          <img
+            src="https://img.icons8.com/ios-filled/24/ffffff/search--v1.png"
+            alt="Search"
+            className="w-5 h-5"
+          />
+        </button>
+      </div>
+
+      {/* Forecast cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 mt-18">
+        {forecast.map((f, i) => (
+          <div
+            key={i}
+            className={`p-6 w-48 h-64 border rounded-2xl shadow-lg flex flex-col items-center transition-colors duration-300 ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+            }`}
+          >
+            <p className="text-base mb-3">
+              {new Date(f.dt * 1000).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+            <img
+              alt="icon"
+              src={`https://openweathermap.org/img/wn/${f.weather[0].icon}@2x.png`}
+              className="w-20 h-20"
+            />
+            <p className="mt-3 font-semibold text-xl">
+              {Math.round(f.main.temp)}°C
+            </p>
+            <p className="text-base capitalize mt-1">
+              {f.weather[0].description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
+
 export default Weatherapp;
