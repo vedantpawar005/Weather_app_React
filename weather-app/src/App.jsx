@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 function Weatherapp() {
   const [city, setCity] = useState("");
   const [forecast, setForecast] = useState([]);
@@ -7,8 +6,10 @@ function Weatherapp() {
   const [darkMode, setDarkMode] = useState(false);
 
   async function getForecast() {
+    
+  const API_KEY=import.meta.env.VITE_API_KEY;
     try {
-      const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=64692fc86a6f990bd9151c6ba77b4d45`;
+      const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`;
       const res = await fetch(geoUrl);
       const geoData = await res.json();
 
@@ -21,13 +22,13 @@ function Weatherapp() {
       const { lat, lon } = geoData[0];
 
       // 🌡️ Get current weather
-      const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=64692fc86a6f990bd9151c6ba77b4d45&units=metric`;
+      const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
       const resCurrent = await fetch(currentUrl);
       const currentData = await resCurrent.json();
       setCurrentWeather(currentData);
 
       // 📅 Get forecast
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=64692fc86a6f990bd9151c6ba77b4d45&units=metric`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
       const res2 = await fetch(forecastUrl);
       const data = await res2.json();
 
@@ -133,5 +134,4 @@ function Weatherapp() {
     </div>
   );
 }
-
 export default Weatherapp;
