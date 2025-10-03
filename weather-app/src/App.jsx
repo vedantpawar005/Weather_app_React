@@ -2,7 +2,7 @@ import { useState } from "react";
 function Weatherapp() {
   const [city, setCity] = useState("");
   const [forecast, setForecast] = useState([]);
-  const [currentWeather, setCurrentWeather] = useState(null); // 🌡️ new state
+  const [currentWeather, setCurrentWeather] = useState(null); 
   const [darkMode, setDarkMode] = useState(false);
 
   async function getForecast() {
@@ -21,13 +21,11 @@ function Weatherapp() {
 
       const { lat, lon } = geoData[0];
 
-      // 🌡️ Get current weather
       const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
       const resCurrent = await fetch(currentUrl);
       const currentData = await resCurrent.json();
       setCurrentWeather(currentData);
 
-      // 📅 Get forecast
       const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
       const res2 = await fetch(forecastUrl);
       const data = await res2.json();
@@ -46,7 +44,7 @@ function Weatherapp() {
         darkMode ? "bg-black text-white" : "bg-white text-black"
       }`}
     >
-      {/* 🌙 Theme Toggle Button */}
+ 
       <button
         onClick={() => setDarkMode(!darkMode)}
         className="absolute top-4 left-4 px-3 py-2 rounded-md border cursor-pointer
@@ -58,7 +56,7 @@ function Weatherapp() {
 
       <h1 className="text-6xl font-bold mb-10">Weather App</h1>
 
-      {/* 🔍 Search Bar */}
+ 
       <div className="flex gap-2">
         <input
           placeholder="Enter City"
@@ -78,7 +76,7 @@ function Weatherapp() {
         </button>
       </div>
 
-      {/* 🌡️ Current Weather */}
+
       {currentWeather && (
         <div
           className={`mt-10 p-6 rounded-2xl shadow-lg flex flex-col items-center text-center ${
@@ -102,7 +100,6 @@ function Weatherapp() {
         </div>
       )}
 
-      {/* 📅 Forecast cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 mt-12">
         {forecast.map((f, i) => (
           <div
